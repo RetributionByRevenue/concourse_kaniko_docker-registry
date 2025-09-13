@@ -1,0 +1,1 @@
+# concourse_kaniko_docker-registry
