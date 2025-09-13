@@ -1,0 +1,31 @@
+resources:
+  - name: docker-hello-world
+    type: git
+    icon: github
+    source:
+      uri: https://github.com/crccheck/docker-hello-world
+  - name: kaniko-image
+    type: docker-image
+    icon: docker
+    source:
+      repository: codebots/kaniko
+      tag: latest
+
+jobs:
+- name: read-the-readme
+  plan:
+  - get: docker-hello-world
+  - get: kaniko-image
+  - task: cat-readme
+    image: kaniko-image
+    config:
+      platform: linux
+      inputs:
+        - name: docker-hello-world
+      run:
+        path: sh
+        args:
+          - -c
+          - |
+            cd docker-hello-world
+            /kaniko/executor --dockerfile=Dockerfile --context=$(pwd) --destination=172.17.0.1:5000/hello-world-local:latest
