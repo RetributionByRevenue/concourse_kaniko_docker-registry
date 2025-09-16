@@ -1,0 +1,8 @@
+:8085 {
+
+    basicauth {
+        admin $2a$12$JGiBJ1Q57k0thdK3tbNe3.4D/ZaxtmZNtFj52.t1j0lajX2aXwt/W  # "admin"
+    }
+
+    reverse_proxy registry-ui:80
+}
