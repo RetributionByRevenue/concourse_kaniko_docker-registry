@@ -8,22 +8,22 @@ resources:
     type: docker-image
     icon: docker
     source:
-      repository: codebots/kaniko
-      tag: latest
+      repository: gcr.io/kaniko-project/executor
+      tag: debug  # debug version includes shell
 
 jobs:
-- name: read-the-readme
+- name: build-hello-world
   plan:
   - get: docker-hello-world
   - get: kaniko-image
-  - task: cat-readme
+  - task: build-with-kaniko
     image: kaniko-image
     config:
       platform: linux
       inputs:
         - name: docker-hello-world
       run:
-        path: sh
+        path: /bin/sh
         args:
           - -c
           - |
