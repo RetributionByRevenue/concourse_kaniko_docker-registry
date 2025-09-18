@@ -3,7 +3,8 @@ resources:
     type: git
     icon: github
     source:
-      uri: https://github.com/crccheck/docker-hello-world
+      uri: https://github.com/cernoel/docker-hello-world
+
   - name: kaniko-image
     type: docker-image
     icon: docker
@@ -11,11 +12,21 @@ resources:
       repository: gcr.io/kaniko-project/executor
       tag: debug  # debug version includes shell
 
+  - name: ssh-client
+    type: docker-image
+    icon: docker
+    source:
+      repository: kroniak/ssh-client
+      
 jobs:
+
 - name: build-hello-world
   plan:
   - get: docker-hello-world
   - get: kaniko-image
+  - get: ssh-client
+
+
   - task: build-with-kaniko
     image: kaniko-image
     config:
@@ -29,3 +40,18 @@ jobs:
           - |
             cd docker-hello-world
             /kaniko/executor --dockerfile=Dockerfile --context=$(pwd) --destination=172.17.0.1:5000/hello-world-local:latest
+
+  - task: adjust-docker-ssh
+    image: ssh-client
+    config:
+      platform: linux
+      run:
+        path: /bin/sh
+        args:
+          - -c
+          - |
+            echo "((ssh-key))" > ssh-key.key
+            chmod 400 ssh-key.key
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ssh-key.key ubuntu@158.178.247.5 -y "sudo docker stop hello-local"
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ssh-key.key ubuntu@158.178.247.5 -y "sudo docker rm hello-local"
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ssh-key.key ubuntu@158.178.247.5 -y "sudo docker run -d -p 8090:8000 --name hello-local 172.17.0.1:5000/hello-world-local:latest"
