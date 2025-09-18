@@ -52,7 +52,7 @@ jobs:
           - |
             echo "((ssh-key))" > ssh-key.key
             chmod 400 ssh-key.key
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ssh-key.key ubuntu@158.178.247.5 -y "sudo docker pull 172.17.0.1:5000/hello-world-local:latest"
             ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ssh-key.key ubuntu@158.178.247.5 -y "sudo docker stop hello-local"
             ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ssh-key.key ubuntu@158.178.247.5 -y "sudo docker rm hello-local"
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ssh-key.key ubuntu@158.178.247.5 -y "sudo docker pull 172.17.0.1:5000/hello-world-local:latest"
             ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ssh-key.key ubuntu@158.178.247.5 -y "sudo docker run -d -p 8090:8000 --name hello-local 172.17.0.1:5000/hello-world-local:latest"
